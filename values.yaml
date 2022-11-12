@@ -1,0 +1,6 @@
+rootUser:
+  password: test
+
+galera:
+  mariabackup:
+    password: test
