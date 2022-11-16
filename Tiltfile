@@ -5,6 +5,13 @@ metadata:
   name: %s
 """ % name))
 
-create_namespace("mariadb-test")
+name = "mariadb-test"
 
-k8s_yaml(helm("charts/mariadb-galera", name = "mariadb-test", namespace = "mariadb-test", values = "values.yaml"))
+create_namespace(name)
+
+objects = read_yaml_stream("tls.yaml")
+for o in objects:
+    o["metadata"]["namespace"] = name
+k8s_yaml(encode_yaml_stream(objects))
+
+k8s_yaml(helm("charts/mariadb-galera", name, namespace = name, values = "values.yaml"))

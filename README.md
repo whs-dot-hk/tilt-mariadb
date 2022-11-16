@@ -3,6 +3,11 @@
 helm pull bitnami/mariadb-galera -d charts --untar
 ```
 
+# Install cert-manager
+```sh
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.10.0/cert-manager.yaml
+```
+
 # Connect
 ```sh
 kubectl run -it --rm --image=mariadb test bash
