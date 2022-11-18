@@ -1,0 +1,52 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: selfsigned-issuer
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Namespace }}-selfsigned-ca
+spec:
+  isCA: true
+  commonName: {{ .Release.Namespace }}-selfsigned-ca
+  secretName: root-secret
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: selfsigned-issuer
+    kind: Issuer
+---
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ .Release.Namespace }}-ca-issuer
+spec:
+  ca:
+    secretName: root-secret
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ .Release.Namespace }}
+spec:
+  secretName: {{ .Release.Namespace }}-tls
+  duration: 8760h
+  renewBefore: 720h
+  isCA: false
+  privateKey:
+    algorithm: RSA
+    encoding: PKCS1
+    size: 2048
+  commonName: {{ .Release.Namespace }}-mariadb-galera
+  dnsNames:
+    - "*.{{ .Release.Namespace }}-mariadb-galera.{{ .Release.Namespace }}.svc.cluster.local"
+    - "{{ .Release.Namespace }}-mariadb-galera.{{ .Release.Namespace }}.svc.cluster.local"
+    - "*.{{ .Release.Namespace }}-mariadb-galera-headless.{{ .Release.Namespace }}.svc.cluster.local"
+    - "{{ .Release.Namespace }}-mariadb-galera-headless.{{ .Release.Namespace }}.svc.cluster.local"
+  issuerRef:
+    name: {{ .Release.Namespace }}-ca-issuer
+    kind: Issuer
